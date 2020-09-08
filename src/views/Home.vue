@@ -1,18 +1,70 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="about">
+    <div class="container">
+      <h1>Ingreso de Pacientes</h1>
+      <hr>
+      <form-comp @edit-patient='patientUpdater' :currentPatient="currentPatient"></form-comp>
+      <h3>Pacientes Ingresados</h3>
+      <ul>
+        <li v-for="patient in patients" :key="patient.id">
+          <div>
+            {{ patient.data.name }} - {{ patient.data.email }}
+            <button @click="deletePatient(patient.id)" class="btn btn-danger">Borrar</button>
+            <button @click="setCurrentPatient(patient)" class="btn btn-info">Editar</button>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import { mapState, mapActions } from 'vuex'
+import FormComp from '../components/FormComp'
 
 export default {
-  name: 'Home',
+  data () {
+    return {
+      currentPatient: {
+        data: {
+          name: '',
+          price: 0,
+          picture: '',
+        },
+        id: undefined
+      }
+    }
+  },
   components: {
-    HelloWorld
+    FormComp
+  },
+  computed: {
+    ...mapState(['patients'])
+  },
+  methods: {
+    ...mapActions(['setPatients', 'deletePatient', 'updatePatient']),
+    setCurrentPatient(patient){
+      this.currentPatient = patient
+    },
+    patientUpdater(patient){
+      const newPatient = {
+        data: {
+          name: patient.data.name,
+          email: patient.data.email,
+        },
+        id: patient.id
+      }
+      this.updatePatient(newPatient)
+    },
+  },
+  created() {
+    this.setPatients() //carga lista existente al crear la página
   }
 }
 </script>
+
+<style scoped>
+  ul li{
+    list-style-type: none;
+  }
+</style>
